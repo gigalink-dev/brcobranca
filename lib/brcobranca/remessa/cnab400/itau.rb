@@ -131,7 +131,7 @@ module Brcobranca
           detalhe << pagamento.nome_avalista.format_size(30)                # nome do sacador/avalista              X[30]
           detalhe << ''.rjust(4, ' ')                                       # complemento do registro               X[04]
           detalhe << ''.rjust(6, '0')                                       # data da mora                          9[06] *
-          detalhe << prazo_instrucao(pagamento)                             # prazo para a instrução          9[02]
+          detalhe << prazo_instrucao(pagamento)                             # prazo para a instrução                9[02]
           detalhe << ''.rjust(1, ' ')                                       # complemento do registro (brancos)     X[01]
           detalhe << sequencial.to_s.rjust(6, '0')                          # numero do registro no arquivo         9[06]
           detalhe
@@ -144,11 +144,11 @@ module Brcobranca
 
         def monta_detalhe_multa(pagamento, sequencial)
           detalhe = '2'
-          detalhe << pagamento.codigo_multa
-          detalhe << pagamento.data_vencimento.strftime('%d%m%Y')
-          detalhe << pagamento.formata_percentual_multa(13)
-          detalhe << ''.rjust(371, ' ')
-          detalhe << sequencial.to_s.rjust(6, '0')
+          detalhe << pagamento.codigo_multa                          # código da multa                             9[01]       002 a 002
+          detalhe << pagamento.formata_data_multa('%d%m%Y')          # Data de Inicio da Cobrança da Multa         9[08]       003 a 010
+          detalhe << pagamento.formata_percentual_multa(13)          # Valor / Percentual multa                    9[13]       011 a 023
+          detalhe << ''.rjust(371, ' ')                              # Brancos                                     9[370]      024 a 394
+          detalhe << sequencial.to_s.rjust(6, '0')                   # Sequencial do registro                      9[06]       395 a 400
           detalhe
         end
       end
