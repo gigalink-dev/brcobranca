@@ -105,13 +105,13 @@ module Brcobranca
           detalhe << codigo_carteira                                        # codigo da carteira                    X[01]
           detalhe << pagamento.identificacao_ocorrencia                     # identificacao ocorrencia              9[02]
           detalhe << pagamento.numero.to_s.rjust(10, '0')                   # numero do documento                   X[10]
-          detalhe << pagamento.data_vencimento.strftime('%d%m%y')           # data do vencimento                    9[06]
+          detalhe << formata_datas_vazias(pagamento.data_vencimento)        # data do vencimento                    9[06]
           detalhe << pagamento.formata_valor                                # valor do documento                    9[13]
           detalhe << cod_banco                                              # codigo banco                          9[03]
           detalhe << ''.rjust(5, '0')                                       # agencia cobradora - deixar zero       9[05]
           detalhe << '99'                                                   # especie  do titulo                    X[02]
           detalhe << aceite                                                 # aceite (A/N)                          X[01]
-          detalhe << pagamento.data_emissao.strftime('%d%m%y')              # data de emissao                       9[06]
+          detalhe << formata_datas_vazias(pagamento.data_emissao)           # data de emissao                       9[06]
           detalhe << pagamento.cod_primeira_instrucao                       # 1a instrucao - deixar zero            X[02]
           detalhe << pagamento.cod_segunda_instrucao                        # 2a instrucao - deixar zero            X[02]
           detalhe << pagamento.formata_valor_mora                           # valor mora ao dia                     9[13]
@@ -140,6 +140,10 @@ module Brcobranca
         def prazo_instrucao(pagamento)
           return '03' unless pagamento.cod_primeira_instrucao == '09'
           pagamento.dias_protesto.rjust(2, '0')
+        end
+
+        def formata_datas_vazias(data)
+          data.try(:strftime, '%d%m%y').to_s.rjust(6, '0')
         end
 
         def monta_detalhe_multa(pagamento, sequencial)

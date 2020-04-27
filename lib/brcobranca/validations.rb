@@ -111,6 +111,7 @@ module Brcobranca
         end
         all_present = true
         presences.each do |presence|
+          next if presence[-1][:if] && !self.send(presence[-1][:if].to_sym)
           presence.select { |p| p.is_a? Symbol}.each do |variable|
             if blank?(self.send(variable))
               all_present = false
@@ -132,6 +133,7 @@ module Brcobranca
         return true if !numericals
         all_numerical = true
         numericals.each do |numerical|
+          next if numerical[-1][:if] && !self.send(numerical[-1][:if].to_sym)
           numerical.select { |p| p.is_a? Symbol}.each do |variable|
             if self.respond_to?(variable) && self.send(variable) && (self.send(variable).to_s =~ /\A[+-]?\d+\z/).nil?
               all_numerical = false
@@ -157,7 +159,7 @@ module Brcobranca
         all_checked = true
         lengths.each do |rule|
           variable = rule[0]
-          next if !self.respond_to?(variable)
+          next if !self.respond_to?(variable) || (rule[-1][:if] && !self.send(rule[-1][:if].to_sym))
           value = self.send(variable)
           if rule[-1][:in]
             if !value

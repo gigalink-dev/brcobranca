@@ -85,15 +85,28 @@ module Brcobranca
       attr_accessor :dias_baixa
       # <b>OPCIONAL</b>: Número da Parcela
       attr_accessor :parcela
+      # <b>OPCIONAL</b>: Indica se a validação será executada
+      # Variável criada, pois no caso de alteração de valor de um título
+      # Somente a informação de valor deve ser informada
+      attr_accessor :executa_validacao_campos
 
-      validates_presence_of :nosso_numero, :data_vencimento, :valor,
+      validates_presence_of :nosso_numero, message: 'não pode estar em branco.'
+      validates_presence_of :data_vencimento, :valor,
         :documento_sacado, :nome_sacado, :endereco_sacado,
-        :cep_sacado, :cidade_sacado, :uf_sacado, message: 'não pode estar em branco.'
-      validates_length_of :uf_sacado, is: 2, message: 'deve ter 2 dígitos.'
-      validates_length_of :cep_sacado, is: 8, message: 'deve ter 8 dígitos.'
-      validates_length_of :cod_desconto, is: 1, message: 'deve ter 1 dígito.'
-      validates_length_of :especie_titulo, is: 2, message: 'deve ter 2 dígitos.', allow_blank: true
+        :cep_sacado, :cidade_sacado, :uf_sacado, message: 'não pode estar em branco.', if: 'executa_validacao_campos?'
+      validates_length_of :uf_sacado, is: 2, message: 'deve ter 2 dígitos.', if: 'executa_validacao_campos?'
+      validates_length_of :cep_sacado, is: 8, message: 'deve ter 8 dígitos.', if: 'executa_validacao_campos?'
+      validates_length_of :cod_desconto, is: 1, message: 'deve ter 1 dígito.', if: 'executa_validacao_campos?'
+      validates_length_of :especie_titulo, is: 2, message: 'deve ter 2 dígitos.', allow_blank: true, if: 'executa_validacao_campos?'
       validates_length_of :identificacao_ocorrencia, is: 2, message: 'deve ter 2 dígitos.'
+
+      # Verifica se as validações devem ser executadas
+      #
+      # @return [Boolean]
+      #
+      def executa_validacao_campos?
+        executa_validacao_campos
+      end
 
       # Nova instancia da classe Pagamento
       #
@@ -121,7 +134,8 @@ module Brcobranca
           codigo_baixa: '0',
           dias_baixa: '000',
           cod_primeira_instrucao: '00',
-          cod_segunda_instrucao: '00'
+          cod_segunda_instrucao: '00',
+          executa_validacao_campos: true
         }
 
         campos = padrao.merge!(campos)
