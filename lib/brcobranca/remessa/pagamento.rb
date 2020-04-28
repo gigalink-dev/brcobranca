@@ -89,6 +89,8 @@ module Brcobranca
       # Variável criada, pois no caso de alteração de valor de um título
       # Somente a informação de valor deve ser informada
       attr_accessor :executa_validacao_campos
+      # Array com os dados da empresa que devem ser vazios na remessa
+      attr_accessor :campos_empresa_vazios
 
       validates_presence_of :nosso_numero, message: 'não pode estar em branco.'
       validates_presence_of :data_vencimento, :valor,
@@ -135,7 +137,8 @@ module Brcobranca
           dias_baixa: '000',
           cod_primeira_instrucao: '00',
           cod_segunda_instrucao: '00',
-          executa_validacao_campos: true
+          executa_validacao_campos: true,
+          campos_empresa_vazios: []
         }
 
         campos = padrao.merge!(campos)

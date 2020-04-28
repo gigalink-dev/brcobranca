@@ -88,9 +88,11 @@ module Brcobranca
         def monta_detalhe(pagamento, sequencial)
           raise Brcobranca::RemessaInvalida, pagamento if pagamento.invalid?
 
+          campos_vazios = pagamento.campos_empresa_vazios
+
           detalhe = '1'                                                     # identificacao transacao               9[01]
-          detalhe << Brcobranca::Util::Empresa.new(documento_cedente).tipo  # tipo de identificacao da empresa      9[02]
-          detalhe << documento_cedente.to_s.rjust(14, '0')                  # cpf/cnpj da empresa                   9[14]
+          detalhe << verifica_campo_vazio(campos_vazios, :tipo_documento_cedente, Brcobranca::Util::Empresa.new(documento_cedente).tipo, '00')  # tipo de identificacao da empresa      9[02]
+          detalhe << verifica_campo_vazio(campos_vazios, :documento_cedente, documento_cedente, '0').to_s.rjust(14, '0') # cpf/cnpj da empresa                   9[14]
           detalhe << agencia                                                # agencia                               9[04]
           detalhe << ''.rjust(2, '0')                                       # complemento de registro (zeros)       9[02]
           detalhe << conta_corrente                                         # conta corrente                        9[05]
@@ -104,13 +106,13 @@ module Brcobranca
           detalhe << ''.rjust(21, ' ')                                      # identificacao da operacao no banco    X[21]
           detalhe << codigo_carteira                                        # codigo da carteira                    X[01]
           detalhe << pagamento.identificacao_ocorrencia                     # identificacao ocorrencia              9[02]
-          detalhe << pagamento.numero.to_s.rjust(10, '0')                   # numero do documento                   X[10]
+          detalhe << verifica_campo_vazio(campos_vazios, :numero_documento, pagamento.numero.to_s.rjust(10, '0'), ''.rjust(10, ' ')) # numero do documento                   X[10]
           detalhe << formata_datas_vazias(pagamento.data_vencimento)        # data do vencimento                    9[06]
           detalhe << pagamento.formata_valor                                # valor do documento                    9[13]
-          detalhe << cod_banco                                              # codigo banco                          9[03]
+          detalhe << verifica_campo_vazio(campos_vazios, :cod_banco, cod_banco, '000')     # codigo banco                          9[03]
           detalhe << ''.rjust(5, '0')                                       # agencia cobradora - deixar zero       9[05]
-          detalhe << '99'                                                   # especie  do titulo                    X[02]
-          detalhe << aceite                                                 # aceite (A/N)                          X[01]
+          detalhe << verifica_campo_vazio(campos_vazios, :especie_titulo, '99', '  ')      # especie  do titulo                    X[02]
+          detalhe << verifica_campo_vazio(campos_vazios, :aceite, aceite, ' ')             # aceite (A/N)                          X[01]
           detalhe << formata_datas_vazias(pagamento.data_emissao)           # data de emissao                       9[06]
           detalhe << pagamento.cod_primeira_instrucao                       # 1a instrucao - deixar zero            X[02]
           detalhe << pagamento.cod_segunda_instrucao                        # 2a instrucao - deixar zero            X[02]
@@ -119,7 +121,7 @@ module Brcobranca
           detalhe << pagamento.formata_valor_desconto                       # valor do desconto                     9[13]
           detalhe << pagamento.formata_valor_iof                            # valor do iof                          9[13]
           detalhe << pagamento.formata_valor_abatimento                     # valor do abatimento                   9[13]
-          detalhe << pagamento.identificacao_sacado                         # identificacao do pagador              9[02]
+          detalhe << verifica_campo_vazio(campos_vazios, :identificacao_sacado, pagamento.identificacao_sacado, '00') # identificacao do pagador              9[02]
           detalhe << pagamento.documento_sacado.to_s.rjust(14, '0')         # documento do pagador                  9[14]
           detalhe << pagamento.nome_sacado.format_size(30)                  # nome do pagador                       X[30]
           detalhe << ''.rjust(10, ' ')                                      # complemento do registro (brancos)     X[10]
@@ -131,7 +133,7 @@ module Brcobranca
           detalhe << pagamento.nome_avalista.format_size(30)                # nome do sacador/avalista              X[30]
           detalhe << ''.rjust(4, ' ')                                       # complemento do registro               X[04]
           detalhe << ''.rjust(6, '0')                                       # data da mora                          9[06] *
-          detalhe << prazo_instrucao(pagamento)                             # prazo para a instrução                9[02]
+          detalhe << verifica_campo_vazio(campos_vazios, :prazo_instrucao, prazo_instrucao(pagamento), '0').rjust(2, '0') # prazo para a instrução                9[02]
           detalhe << ''.rjust(1, ' ')                                       # complemento do registro (brancos)     X[01]
           detalhe << sequencial.to_s.rjust(6, '0')                          # numero do registro no arquivo         9[06]
           detalhe
@@ -144,6 +146,12 @@ module Brcobranca
 
         def formata_datas_vazias(data)
           data.try(:strftime, '%d%m%y').to_s.rjust(6, '0')
+        end
+
+        def verifica_campo_vazio(campos_vazios, campo, valor, caracter_vazio)
+          return valor if campos_vazios.empty? || !campos_vazios.include?(campo)
+
+          caracter_vazio
         end
 
         def monta_detalhe_multa(pagamento, sequencial)
