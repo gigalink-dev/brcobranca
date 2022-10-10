@@ -22,7 +22,7 @@ module Brcobranca
           # começa do 0 então contar com +1 as posições
           parse.field :codigo_registro, 0..0
           parse.field :tipo_de_empresa, 1..2
-          parse.field :cpf_cnpf, 3..16
+          parse.field :cpf_cnpj, 3..16
           #parse.field :brancos, 17..36 [BRANCOS]
           #parse.field :uso_da_empresa, 37..61 [BRANCOS]
           parse.field :nosso_numero, 62..72
