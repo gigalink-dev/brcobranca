@@ -11,6 +11,8 @@ module Brcobranca
           return nil if file.blank?
 
           codigo_banco = codigo_banco_do_arquivo(file)
+          
+          puts codigo_banco
 
           case codigo_banco
           when '001'
