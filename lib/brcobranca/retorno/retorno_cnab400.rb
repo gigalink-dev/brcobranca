@@ -21,6 +21,8 @@ module Brcobranca
         super file, options
       end
 
+      raise 'Padrão'
+
       fixed_width_layout do |parse|
         parse.field :codigo_registro, 0..0
         parse.field :agencia_com_dv, 17..20 # FIXME - SEM DIV
