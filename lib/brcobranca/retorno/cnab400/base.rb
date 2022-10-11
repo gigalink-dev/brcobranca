@@ -11,10 +11,11 @@ module Brcobranca
           return nil if file.blank?
 
           codigo_banco = codigo_banco_do_arquivo(file)
-          
+
           puts codigo_banco
 
-          case codigo_banco
+          raise codigo_banco
+          
           when '001'
             Brcobranca::Retorno::Cnab400::BancoBrasil.load_lines(file, options)
           when "004"
