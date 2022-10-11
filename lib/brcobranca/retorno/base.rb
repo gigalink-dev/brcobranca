@@ -44,6 +44,13 @@ module Brcobranca
       attr_accessor :valor_ajuste
       attr_accessor :sequencial
       attr_accessor :arquivo
+      attr_accessor :tipo_de_empresa
+      attr_accessor :cpf_cnpj
+      attr_accessor :nossa_carteira
+      attr_accessor :seu_numero
+      attr_accessor :tarifa_cobranca
+      attr_accessor :codigo_moeda
+      attr_accessor :erro_retorno
     end
   end
 end
