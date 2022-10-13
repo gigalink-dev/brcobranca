@@ -16,6 +16,7 @@ module Brcobranca
 
           raise codigo_banco
           
+          case codigo_banco
           when '001'
             Brcobranca::Retorno::Cnab400::BancoBrasil.load_lines(file, options)
           when "004"
