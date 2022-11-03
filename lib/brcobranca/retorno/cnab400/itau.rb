@@ -111,12 +111,13 @@ module Brcobranca
           # :brancos , 354..376 # complemento de registro
           # :erros_msg, 377..384 #registros rejeitados ou laegacao do sacado ou registro de mensagem informativa
           # :brancos, 385..391 #complemento de registro
-          # :cod_de_liquidacao, 392..393 #meio pelo qual o título foi liquidado
 
           parse.field :motivo_ocorrencia, 377..384, ->(motivos) do
             motivos.scan(/.{2}/).reject(&:blank?).reject{|motivo| motivo == '00'}
           end
 
+          parse.field :cod_de_liquidacao, 392..393 #meio pelo qual o título foi liquidado
+          
           # :numero_sequencial, 394..399 #numero sequencial no arquivo
           parse.field :sequencial, 394..399
 

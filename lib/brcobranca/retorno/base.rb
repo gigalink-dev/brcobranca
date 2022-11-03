@@ -51,6 +51,7 @@ module Brcobranca
       attr_accessor :tarifa_cobranca
       attr_accessor :codigo_moeda
       attr_accessor :erro_retorno
+      attr_accessor :cod_de_liquidacao
     end
   end
 end
