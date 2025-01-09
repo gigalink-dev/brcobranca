@@ -1,20 +1,23 @@
-# -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
 module Brcobranca
   module Boleto
-    class Cecred < Base # Cecred
+    # Ailos
+    class Ailos < Base
       validates_length_of :agencia, maximum: 4, message: 'deve ser menor ou igual a 4 dígitos.'
-      validates_length_of :conta_corrente, maximum: 7, message: 'deve ser menor ou igual a 7 dígitos.'
+      validates_length_of :conta_corrente,
+                          maximum: 8,
+                          message: 'deve ser menor ou igual a 8 dígitos.'
       validates_length_of :carteira, is: 2, message: 'deve ser menor ou igual a 2 dígitos.'
       validates_length_of :convenio, is: 6, message: 'deve ser menor ou igual a 6 dígitos.'
-
       validates_length_of :nosso_numero, maximum: 9, message: 'deve ser menor ou igual a 9 dígitos.'
 
-      # Nova instancia do Cecred
+      # Nova instancia do Ailos
       # @param (see Brcobranca::Boleto::Base#initialize)
       def initialize(campos = {})
         campos = {
           carteira: '1',
-          local_pagamento: 'PAGÁVEL PREFERENCIALMENTE NAS COOPERATIVAS DO SISTEMA CECRED'
+          local_pagamento: 'Pagar preferencialmente nas cooperativas do Sistema AILOS.'
         }.merge!(campos)
         super(campos)
       end
@@ -29,7 +32,7 @@ module Brcobranca
       # Dígito verificador do banco
       # @return [Integer] 1 caracteres numéricos.
       def banco_dv
-        "1"
+        '1'
       end
 
       # Dígito verificador da conta corrente

@@ -1,36 +1,36 @@
-# -*- encoding: utf-8 -*-
-#
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Brcobranca::Currency::String do
   it 'returns true if value seted is a valid ruby number' do
-    expect('1234'.numeric?).to be_truthy
-    expect('123.4'.numeric?).to be_truthy
-    expect('123,4'.numeric?).to be_truthy
-    expect('1234.03'.numeric?).to be_truthy
-    expect('1234,03'.numeric?).to be_truthy
-    expect('-1234'.numeric?).to be_truthy
-    expect('-123.4'.numeric?).to be_truthy
-    expect('-123,4'.numeric?).to be_truthy
-    expect('-1234.03'.numeric?).to be_truthy
-    expect('-1234,03'.numeric?).to be_truthy
-    expect('+1234'.numeric?).to be_truthy
-    expect('+123.4'.numeric?).to be_truthy
-    expect('+123,4'.numeric?).to be_truthy
-    expect('+1234.03'.numeric?).to be_truthy
-    expect('+1234,03'.numeric?).to be_truthy
+    expect('1234').to be_numeric
+    expect('123.4').to be_numeric
+    expect('123,4').to be_numeric
+    expect('1234.03').to be_numeric
+    expect('1234,03').to be_numeric
+    expect('-1234').to be_numeric
+    expect('-123.4').to be_numeric
+    expect('-123,4').to be_numeric
+    expect('-1234.03').to be_numeric
+    expect('-1234,03').to be_numeric
+    expect('+1234').to be_numeric
+    expect('+123.4').to be_numeric
+    expect('+123,4').to be_numeric
+    expect('+1234.03').to be_numeric
+    expect('+1234,03').to be_numeric
   end
 
   it 'returns false if value seted is NOT a valid ruby number' do
-    expect('1234,'.numeric?).to be_falsey
-    expect('1234.'.numeric?).to be_falsey
-    expect('1,234.03'.numeric?).to be_falsey
-    expect('1.234.03'.numeric?).to be_falsey
-    expect('1,234,03'.numeric?).to be_falsey
-    expect('12.340,03'.numeric?).to be_falsey
-    expect('1234ab'.numeric?).to be_falsey
-    expect('ab1213'.numeric?).to be_falsey
-    expect('ffab'.numeric?).to be_falsey
+    expect('1234,').not_to be_numeric
+    expect('1234.').not_to be_numeric
+    expect('1,234.03').not_to be_numeric
+    expect('1.234.03').not_to be_numeric
+    expect('1,234,03').not_to be_numeric
+    expect('12.340,03').not_to be_numeric
+    expect('1234ab').not_to be_numeric
+    expect('ab1213').not_to be_numeric
+    expect('ffab').not_to be_numeric
   end
 
   it 'converts value seted to valid ruby number' do
@@ -59,10 +59,10 @@ RSpec.describe Brcobranca::Currency::Number do
     expect(1234.to_currency).to eql('1.234,00')
     expect(123.4.to_currency).to eql('123,40')
     expect(1234.03.to_currency).to eql('1.234,03')
-    expect(1234.03.to_currency(options = { unit: 'R$ ' })).to eql('R$ 1.234,03')
-    expect(1234.03.to_currency(options = { unit: 'R$ ', separator: '.' })).to eql('R$ 1.234.03')
-    expect(1234.03.to_currency(options = { unit: 'R$ ', separator: '.', delimiter: ',' })).to eql('R$ 1,234.03')
-    expect(1234.03.to_currency(options = { unit: 'R$ ', precision: 3 })).to eql('R$ 1.234,030')
+    expect(1234.03.to_currency({ unit: 'R$ ' })).to eql('R$ 1.234,03')
+    expect(1234.03.to_currency({ unit: 'R$ ', separator: '.' })).to eql('R$ 1.234.03')
+    expect(1234.03.to_currency({ unit: 'R$ ', separator: '.', delimiter: ',' })).to eql('R$ 1,234.03')
+    expect(1234.03.to_currency({ unit: 'R$ ', precision: 3 })).to eql('R$ 1.234,030')
   end
 
   it 'converts value seted using delimiter and separator' do

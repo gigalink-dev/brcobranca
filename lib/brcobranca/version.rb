@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
-#
+# frozen_string_literal: true
 
 module Brcobranca
-  VERSION = '9.2.4'
+  VERSION = '11.1.0'
 end

@@ -1,5 +1,5 @@
-# -*- encoding: utf-8 -*-
-#
+# frozen_string_literal: true
+
 require 'parseline'
 
 module Brcobranca
@@ -14,7 +14,7 @@ module Brcobranca
         def self.load_lines(file, options = {})
           default_options = { except: [1] } # por padrao ignora a primeira linha que é header
           options = default_options.merge!(options)
-          super file, options
+          super(file, options)
         end
 
         fixed_width_layout do |parse|
@@ -22,6 +22,9 @@ module Brcobranca
           # :tipo_de_registro, 0..0 # identificacao do registro transacao
           # :zeros, 1..2 # zeros
           # :zeros, 3..16 #zeros
+
+          # :codigo_registro, 0..0 #identificação do registro
+          parse.field :codigo_registro, 0..0
 
           # :agencia, 17..21 #agencia mantenedora da conta com digito
           parse.field :agencia_com_dv, 17..21
@@ -41,7 +44,7 @@ module Brcobranca
           # :dias, 82..85 #dias para calculo
 
           # :natureza_recebimento, 86..87 #natureza do recebimento
-          parse.field :motivos_de_ocorrencia, 86..87, ->(motivos) { motivos.scan(/../).reject { |n| n.to_i.zero? } }
+          parse.field :motivo_ocorrencia, 86..87, ->(motivos) { motivos.scan(/../).reject { |n| n.to_i.zero? } }
 
           # :prefixo_titulo, 88..90 #prefixo do titulo
           parse.field :carteira_variacao, 91..93

@@ -1,4 +1,5 @@
-# -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
 require 'parseline'
 
 module Brcobranca
@@ -12,7 +13,7 @@ module Brcobranca
           default_options = { except: [1] } # por padrao ignora a primeira linha que é header
           options = default_options.merge!(options)
 
-          super file, options
+          super(file, options)
         end
 
         fixed_width_layout do |parse|

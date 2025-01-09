@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
 module Brcobranca
   module Remessa
     module Cnab400
       class Itau < Brcobranca::Remessa::Cnab400::Base
-        VALOR_EM_REAIS = "1"
-        VALOR_EM_PERCENTUAL = "2"
+        VALOR_EM_REAIS = '1'
+        VALOR_EM_PERCENTUAL = '2'
 
         validates_presence_of :agencia, :conta_corrente, message: 'não pode estar em branco.'
         validates_presence_of :documento_cedente, :digito_conta, message: 'não pode estar em branco.'
@@ -73,6 +74,7 @@ module Brcobranca
           return 'U' if carteira.to_s == '150'
           return '1' if carteira.to_s == '191'
           return 'E' if carteira.to_s == '147'
+
           'I'
         end
 
@@ -89,7 +91,7 @@ module Brcobranca
           raise Brcobranca::RemessaInvalida, pagamento if pagamento.invalid?
 
           detalhe = '1'                                                     # identificacao transacao               9[01]
-          detalhe << Brcobranca::Util::Empresa.new(documento_cedente).tipo  # tipo de identificacao da empresa      9[02]
+          detalhe += Brcobranca::Util::Empresa.new(documento_cedente).tipo  # tipo de identificacao da empresa      9[02]
           detalhe << documento_cedente.to_s.rjust(14, '0')                  # cpf/cnpj da empresa                   9[14]
           detalhe << agencia                                                # agencia                               9[04]
           detalhe << ''.rjust(2, '0')                                       # complemento de registro (zeros)       9[02]
@@ -109,11 +111,11 @@ module Brcobranca
           detalhe << pagamento.formata_valor                                # valor do documento                    9[13]
           detalhe << cod_banco                                              # codigo banco                          9[03]
           detalhe << ''.rjust(5, '0')                                       # agencia cobradora - deixar zero       9[05]
-          detalhe << '99'                                                   # especie  do titulo                    X[02]
+          detalhe << pagamento.especie_titulo                               # especie  do titulo                    X[02]
           detalhe << aceite                                                 # aceite (A/N)                          X[01]
           detalhe << pagamento.data_emissao.strftime('%d%m%y')              # data de emissao                       9[06]
-          detalhe << pagamento.cod_primeira_instrucao                       # 1a instrucao - deixar zero            X[02]
-          detalhe << pagamento.cod_segunda_instrucao                        # 2a instrucao - deixar zero            X[02]
+          detalhe << pagamento.cod_primeira_instrucao.to_s.rjust(2, '0')    # 1a instrucao - deixar zero            X[02]
+          detalhe << pagamento.cod_segunda_instrucao.to_s.rjust(2, '0')     # 2a instrucao - deixar zero            X[02]
           detalhe << pagamento.formata_valor_mora                           # valor mora ao dia                     9[13]
           detalhe << pagamento.formata_data_desconto                        # data limite para desconto             9[06]
           detalhe << pagamento.formata_valor_desconto                       # valor do desconto                     9[13]
@@ -138,13 +140,16 @@ module Brcobranca
         end
 
         def prazo_instrucao(pagamento)
-          return '03' unless pagamento.cod_primeira_instrucao == '09'
+          return "03" unless %w[09 34 35].include?(
+            pagamento.cod_primeira_instrucao
+          )
+
           pagamento.dias_protesto.rjust(2, '0')
         end
 
         def monta_detalhe_multa(pagamento, sequencial)
           detalhe = '2'
-          detalhe << pagamento.codigo_multa
+          detalhe += pagamento.codigo_multa
           detalhe << pagamento.data_vencimento.strftime('%d%m%Y')
           detalhe << pagamento.formata_percentual_multa(13)
           detalhe << ''.rjust(371, ' ')

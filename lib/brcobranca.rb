@@ -1,5 +1,5 @@
-# -*- encoding: utf-8 -*-
-#
+# frozen_string_literal: true
+
 require 'brcobranca/calculo'
 require 'brcobranca/limpeza'
 require 'brcobranca/formatacao'
@@ -8,6 +8,7 @@ require 'brcobranca/calculo_data'
 require 'brcobranca/currency'
 require 'brcobranca/validations'
 require 'brcobranca/util/date'
+require 'fast_blank'
 
 module Brcobranca
   # Exception lançada quando algum tipo de boleto soicitado ainda não tiver sido implementado.
@@ -111,15 +112,17 @@ module Brcobranca
     autoload :Banestes,      'brcobranca/boleto/banestes'
     autoload :Banrisul,      'brcobranca/boleto/banrisul'
     autoload :Credisis,      'brcobranca/boleto/credisis'
-    autoload :Cecred,        'brcobranca/boleto/cecred'
     autoload :Safra,         'brcobranca/boleto/safra'
     autoload :Citibank,      'brcobranca/boleto/citibank'
+    autoload :Ailos,         'brcobranca/boleto/ailos'
 
     # Módulos para classes de template
     module Template
       autoload :Base,        'brcobranca/boleto/template/base'
       autoload :Rghost,      'brcobranca/boleto/template/rghost'
+      autoload :Rghost2,     'brcobranca/boleto/template/rghost2'
       autoload :RghostCarne, 'brcobranca/boleto/template/rghost_carne'
+      autoload :RghostBolepix, 'brcobranca/boleto/template/rghost_bolepix'
     end
   end
 
@@ -146,10 +149,10 @@ module Brcobranca
     module Cnab240
       autoload :Base,          'brcobranca/retorno/cnab240/base'
       autoload :Santander,     'brcobranca/retorno/cnab240/santander'
-      autoload :Cecred,        'brcobranca/retorno/cnab240/cecred'
       autoload :Sicredi,       'brcobranca/retorno/cnab240/sicredi'
       autoload :Sicoob,        'brcobranca/retorno/cnab240/sicoob'
       autoload :Caixa,         'brcobranca/retorno/cnab240/caixa'
+      autoload :Ailos,         'brcobranca/retorno/cnab240/ailos'
     end
   end
 
@@ -177,12 +180,13 @@ module Brcobranca
       autoload :Base,               'brcobranca/remessa/cnab240/base'
       autoload :BaseCorrespondente, 'brcobranca/remessa/cnab240/base_correspondente'
       autoload :Caixa,              'brcobranca/remessa/cnab240/caixa'
-      autoload :Cecred,             'brcobranca/remessa/cnab240/cecred'
       autoload :BancoBrasil,        'brcobranca/remessa/cnab240/banco_brasil'
+      autoload :Santander,          'brcobranca/remessa/cnab240/santander'
       autoload :Sicoob,             'brcobranca/remessa/cnab240/sicoob'
       autoload :SicoobBancoBrasil,  'brcobranca/remessa/cnab240/sicoob_banco_brasil'
       autoload :Sicredi,            'brcobranca/remessa/cnab240/sicredi'
       autoload :Unicred,            'brcobranca/remessa/cnab240/unicred'
+      autoload :Ailos,              'brcobranca/remessa/cnab240/ailos'
     end
   end
 

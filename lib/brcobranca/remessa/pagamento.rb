@@ -1,8 +1,8 @@
-# -*- encoding: utf-8 -*-
+# frozen_string_literal: true
+
 module Brcobranca
   module Remessa
     class Pagamento
-
       include Brcobranca::Validations
 
       # <b>REQUERIDO</b>: nosso numero
@@ -61,6 +61,10 @@ module Brcobranca
       attr_accessor :data_segundo_desconto
       # <b>OPCIONAL</b>: valor a ser concedido de desconto
       attr_accessor :valor_segundo_desconto
+      # <b>OPCIONAL</b>: data limite para o terceiro desconto
+      attr_accessor :data_terceiro_desconto
+      # <b>OPCIONAL</b>: valor a ser concedido de desconto
+      attr_accessor :valor_terceiro_desconto
       # <b>OPCIONAL</b>: espécie do título
       attr_accessor :especie_titulo
       # <b>OPCIONAL</b>: código da multa
@@ -87,8 +91,8 @@ module Brcobranca
       attr_accessor :parcela
 
       validates_presence_of :nosso_numero, :data_vencimento, :valor,
-        :documento_sacado, :nome_sacado, :endereco_sacado,
-        :cep_sacado, :cidade_sacado, :uf_sacado, message: 'não pode estar em branco.'
+                            :documento_sacado, :nome_sacado, :endereco_sacado,
+                            :cep_sacado, :cidade_sacado, :uf_sacado, message: 'não pode estar em branco.'
       validates_length_of :uf_sacado, is: 2, message: 'deve ter 2 dígitos.'
       validates_length_of :cep_sacado, is: 8, message: 'deve ter 8 dígitos.'
       validates_length_of :cod_desconto, is: 1, message: 'deve ter 1 dígito.'
@@ -102,11 +106,13 @@ module Brcobranca
       def initialize(campos = {})
         padrao = {
           data_emissao: Date.current,
-          data_segundo_desconto:'00-00-00',
-          tipo_mora: "3",
+          data_segundo_desconto: '00-00-00',
+          data_terceiro_desconto: '00-00-00',
+          tipo_mora: '3',
           valor_mora: 0.0,
           valor_desconto: 0.0,
           valor_segundo_desconto: 0.0,
+          valor_terceiro_desconto: 0.0,
           valor_iof: 0.0,
           valor_abatimento: 0.0,
           nome_avalista: '',
@@ -126,7 +132,7 @@ module Brcobranca
 
         campos = padrao.merge!(campos)
         campos.each do |campo, valor|
-          send "#{campo}=", valor
+          send :"#{campo}=", valor
         end
 
         yield self if block_given?
@@ -138,7 +144,7 @@ module Brcobranca
       #
       def formata_data_desconto(formato = '%d%m%y')
         data_desconto.strftime(formato)
-      rescue
+      rescue StandardError
         if formato == '%d%m%y'
           '000000'
         else
@@ -152,7 +158,21 @@ module Brcobranca
       #
       def formata_data_segundo_desconto(formato = '%d%m%y')
         data_segundo_desconto.strftime(formato)
-      rescue
+      rescue StandardError
+        if formato == '%d%m%y'
+          '000000'
+        else
+          '00000000'
+        end
+      end
+
+      # Formata a data de terceiro desconto de acordo com o formato passado
+      #
+      # @return [String]
+      #
+      def formata_data_terceiro_desconto(formato = '%d%m%y')
+        data_terceiro_desconto.strftime(formato)
+      rescue StandardError
         if formato == '%d%m%y'
           '000000'
         else
@@ -168,7 +188,7 @@ module Brcobranca
       # @return [String]
       #
       def formata_percentual_multa(tamanho = 4)
-        format_value(percentual_multa, tamanho)
+        format_value(:percentual_multa, tamanho)
       end
 
       # Formata a data de cobrança da multa
@@ -177,7 +197,7 @@ module Brcobranca
       #
       def formata_data_multa(formato = '%d%m%y')
         data_multa.strftime(formato)
-      rescue
+      rescue StandardError
         if formato == '%d%m%y'
           '000000'
         else
@@ -193,11 +213,11 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor(tamanho = 13)
-        format_value(valor, tamanho)
+        format_value(:valor, tamanho)
       end
 
       def documento_ou_numero
-        documento.present? ? documento : numero
+        documento || numero
       end
 
       def formata_documento_ou_numero(tamanho = 25, caracter = ' ')
@@ -211,7 +231,7 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_mora(tamanho = 13)
-        format_value(valor_mora, tamanho)
+        format_value(:valor_mora, tamanho)
       end
 
       # Formata o campo valor da multa
@@ -220,7 +240,7 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_multa(tamanho = 6)
-        format_value(percentual_multa, tamanho)
+        format_value(:percentual_multa, tamanho)
       end
 
       # Formata o campo valor do desconto
@@ -229,7 +249,7 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_desconto(tamanho = 13)
-        format_value(valor_desconto, tamanho)
+        format_value(:valor_desconto, tamanho)
       end
 
       # Formata o campo valor do segundo desconto
@@ -238,7 +258,16 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_segundo_desconto(tamanho = 13)
-        format_value(valor_segundo_desconto, tamanho)
+        format_value(:valor_segundo_desconto, tamanho)
+      end
+
+      # Formata o campo valor do terceiro desconto
+      #
+      # @param tamanho [Integer]
+      #   quantidade de caracteres a ser retornado
+      #
+      def formata_valor_terceiro_desconto(tamanho = 13)
+        format_value(:valor_terceiro_desconto, tamanho)
       end
 
       # Formata o campo valor do IOF
@@ -247,7 +276,7 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_iof(tamanho = 13)
-        format_value(valor_iof, tamanho)
+        format_value(:valor_iof, tamanho)
       end
 
       # Formata o campo valor do IOF
@@ -256,7 +285,7 @@ module Brcobranca
       #   quantidade de caracteres a ser retornado
       #
       def formata_valor_abatimento(tamanho = 13)
-        format_value(valor_abatimento, tamanho)
+        format_value(:valor_abatimento, tamanho)
       end
 
       # Retorna a identificacao do pagador
@@ -273,15 +302,18 @@ module Brcobranca
       #
       def identificacao_avalista(zero = true)
         return '0' if documento_avalista.nil?
+
         Brcobranca::Util::Empresa.new(documento_avalista, zero).tipo
       end
 
       private
 
-      def format_value(value, tamanho)
-        raise ValorInvalido, 'Deve ser um Float' unless value.to_s =~ /\./
+      def format_value(attribute, tamanho)
+        value = send(attribute)
 
-        sprintf('%.2f', value).delete('.').rjust(tamanho, '0')
+        raise ValorInvalido, "Pagamento##{attribute}: Deve ser um Float" unless value.to_s.include?('.')
+
+        format('%.2f', value).delete('.').rjust(tamanho, '0')
       end
     end
   end
